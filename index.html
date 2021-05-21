@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic Tok</title>
+
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<style>
+    #app table {
+        margin: 0px auto 10px;
+        border: 3px solid #DDD;
+        box-shadow: 3px 3px 15px rgb(88, 79, 79);
+    }
+
+    #app table td {
+        width: 70px;
+        height: 70px;
+        text-align: center;
+        font-size: 25px;
+        font-weight: bolder;
+        border: 3px solid #DDD;
+        cursor: pointer;
+    }
+
+    #app table td:hover {
+        opacity: 0.5;
+        background-color: #FFF;
+    }
+
+    #app .info {
+        margin: 200px auto 30px;
+        color: rgb(149, 139, 139);
+        font-size: 25px;
+    }
+
+    #app .R {
+        color: red;
+    }
+
+    #app .G {
+        color: green;
+    }
+</style>
+
+<body>
+
+
+
+
+    <div id="app">
+        <div class="container">
+            <h3 class="info">Turn: Player : <span v-bind:class="{R : turn=='X',G : turn=='O'}">{{ turn }}</span></h3>
+            <table>
+                <tr v-for="row in board">
+                    <td v-for="cell in row" @click="setVal(cell)"
+                        v-bind:class="{R : cell.value=='X',G : cell.value=='O'}">
+                        {{ cell.value }}
+                    </td>
+                </tr>
+
+            </table>
+        </div>
+
+    </div>
+
+
+
+    <script src="js/vue.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+    <script>
+
+
+        var App = new Vue({
+            el: '#app',
+            data: {
+                turn: 'X',
+                board: [
+                    [{ value: '' }, { value: '' }, { value: '' }],
+                    [{ value: '' }, { value: '' }, { value: '' }],
+                    [{ value: '' }, { value: '' }, { value: '' }],
+                ],
+                chances: [
+                    [[0, 0], [0, 1], [0, 2]],
+                    [[1, 0], [1, 1], [1, 2]],
+                    [[2, 0], [2, 1], [2, 2]],
+                    [[0, 0], [1, 0], [2, 0]],
+                    [[0, 1], [1, 1], [2, 1]],
+                    [[0, 2], [1, 2], [2, 2]],
+                    [[0, 0], [1, 1], [2, 2]],
+                    [[0, 2], [1, 1], [2, 0]],
+                ],
+            },
+
+            methods: {
+
+
+                sweetAlert: function (type, message) {
+
+                    // Create Sweet Alert
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        position: 'top',
+                        showConfirmButton: false,
+                        timer: 3000,
+                        timerProgressBar: true,
+                        didOpen: (toast) => {
+                            toast.addEventListener('mouseenter', Swal.stopTimer)
+                            toast.addEventListener('mouseleave', Swal.resumeTimer)
+                        }
+                    })
+
+                    Toast.fire({
+                        icon: type,
+                        title: message
+                    })
+
+                },
+
+                setVal: function (cell) {
+                    if (cell.value) {
+                        this.sweetAlert('error', 'This cell Busy, Choose another cell');
+
+                        return;
+                    }
+                    cell.value = this.turn;
+                    this.checkWinner();
+                    this.turn = (this.turn == 'X') ? 'O' : 'X';
+                },
+                checkWinner: function () {
+                    this.chances.forEach(function (chance, index) {
+                        var check = chance.every(function (item) {
+                            return App.board[item[0]][item[1]].value == App.turn;
+                        });
+                        if (check) {
+                            App.sweetAlert('success', 'Player ' + App.turn + ' : You Are Win!');
+                            setTimeout(function () { document.location.reload(true); }, 4000);
+
+                        }
+
+                    });
+
+
+                },
+
+
+            }
+
+
+
+
+
+        });
+    </script>
+
+</body>
+
+</html>
